@@ -23,14 +23,14 @@ def main():
 
     # print(data_in_table(raw_data))
 
-    daily_raw_data_i = raw_daily_data_imperial(52.52, 13.41)
+    # daily_raw_data_i = raw_daily_data_imperial(52.52, 13.41)
 
     # print(daily_raw_data)
 
 
-    print(daily_data_units(daily_raw_data_i))
+    # print(daily_data_units(daily_raw_data_i))
 
-    print(daily_data_table(daily_raw_data_i))
+    # print(daily_data_table(daily_raw_data_i))
 
     # print("******")
     # print()
@@ -41,7 +41,8 @@ def main():
     # print(daily_data_units(daily_raw_data))
 
     # print(daily_data_table(daily_raw_data))
-
+    raw_data = hourly_imperial_data(52.52, 13.41)
+    print(data_in_table(raw_data))
 
 
 """
@@ -51,7 +52,7 @@ for that place in JSON format
 It provides hourly data for a total of 8 days which includes the hourly weather 
 for the next(future) 3 days.
 """
-def fetch_hourly_rawdata(lat, lng):
+def fetch_hourly_metric_data(lat, lng):
 
     url = "https://api.open-meteo.com/v1/forecast"
 
@@ -75,6 +76,48 @@ def fetch_hourly_rawdata(lat, lng):
         "start_date": past_date.isoformat(),
         "end_date": future_date.isoformat(),
         "timezone": "auto"
+    }
+
+    response = requests.get(url, params=params)
+
+    # convert response to JSON
+    data = response.json()
+
+    return data
+
+"""
+Fetches hourly weather data in imperial units (Fahrenheit, mph, inches).
+Default range: past 4 days + next 3 days.
+Returns raw JSON from Open-Meteo API.
+"""
+def hourly_imperial_data(lat, lng):
+
+    url = "https://api.open-meteo.com/v1/forecast"
+
+    today = date.today()
+
+    past_date = today - timedelta(days=4)
+    future_date = today + timedelta(days=3)
+
+    params = {
+        "latitude": lat,
+        "longitude": lng,
+        "hourly": [
+            "temperature_2m",
+            "relative_humidity_2m",
+            "precipitation",
+            "wind_speed_10m",
+            "cloud_cover",
+            "surface_pressure",
+            "wind_direction_10m"
+        ],
+        "start_date": past_date.isoformat(),
+        "end_date": future_date.isoformat(),
+        "timezone": "auto",
+        "temperature_unit": "fahrenheit",
+        "wind_speed_unit": "mph",
+        "precipitation_unit": "inch",
+
     }
 
     response = requests.get(url, params=params)
