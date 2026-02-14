@@ -118,7 +118,7 @@ def analyze_data_daily(
 
     Returns:
         tuple: A tuple containing DataFrames for a custom time limit interval (default is 30 days),
-               as well as DataFrames with min, max, and average statistics for each interval.
+               as well as DataFrames with min, max, and average statistics for that interval.
     """
 
     # Convert timestamp strings to datetime objects
@@ -133,27 +133,20 @@ def analyze_data_daily(
     # This assumes that the DataFrame is sorted by time in ascending order
     df_custom = df[df["time"] >= (df.iloc[-1].loc["time"] - days_limit).isoformat()]
 
-    # Calculate min, max and average values for the entire DataFrame
-    min_data = df.drop("time", axis=1).min()
-    max_data = df.drop("time", axis=1).max()
-    avg_data = df.drop("time", axis=1).mean()
-
     # Calculate min, max and average values for the custom time limit DataFrame
     min_data_custom = df_custom.drop("time", axis=1).min()
     max_data_custom = df_custom.drop("time", axis=1).max()
     avg_data_custom = df_custom.drop("time", axis=1).mean()
 
     # Combine the series into a DataFrame (first combine into columns and then transpose)
-    df_stats = pd.concat([min_data, max_data, avg_data], axis=1).T
     df_stats_custom = pd.concat(
         [min_data_custom, max_data_custom, avg_data_custom], axis=1
     ).T
 
     # Rename the row labels
-    df_stats.rename(index={0: "min", 1: "max", 2: "avg"}, inplace=True)
     df_stats_custom.rename(index={0: "min", 1: "max", 2: "avg"}, inplace=True)
 
-    return df_custom, df_stats, df_stats_custom
+    return df_custom, df_stats_custom
 
 
 if __name__ == "__main__":
