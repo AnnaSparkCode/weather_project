@@ -21,8 +21,8 @@ def analyze_data_hourly(
         df (pd.DataFrame): DataFrame containing weather data with a 'time' column.
 
     Returns:
-        tuple: A tuple containing DataFrames for 5 hour, 1 day and the archived 4 day intervals,
-               as well as DataFrames with min, max, and average statistics for each interval and the forecast data.
+        tuple: A tuple containing DataFrames for archived data (5 hours, 1 day, and 4 days) and forecast data (3 days),
+               as well as DataFrames with min, max, and average statistics for each interval.
     """
 
     # Convert timestamp strings to datetime objects
@@ -32,7 +32,7 @@ def analyze_data_hourly(
     hours_5 = timedelta(hours=5)
     days_1 = timedelta(days=1)
 
-    # Split historical and forecast data
+    # Split archived and forecast data
     # .dt.date is used to compare only the date part of the timestamp, ignoring the time part
 
     # Future data (forecast) - 3 days ahead
@@ -117,7 +117,7 @@ def analyze_data_daily(
         df (pd.DataFrame): DataFrame containing weather data with a 'time' column.
 
     Returns:
-        tuple: A tuple containing DataFrames for 7 day, 30 day, and 90 day intervals,
+        tuple: A tuple containing DataFrames for a custom time limit interval (default is 30 days),
                as well as DataFrames with min, max, and average statistics for each interval.
     """
 
@@ -129,7 +129,7 @@ def analyze_data_daily(
 
     days_limit = timedelta(days=time_limit)
 
-    # From the last timestamp, go back  a custom time limit set by the user (default is 30 days)
+    # From the last timestamp, go back a custom time limit set by the user (default is 30 days)
     # This assumes that the DataFrame is sorted by time in ascending order
     df_custom = df[df["time"] >= (df.iloc[-1].loc["time"] - days_limit).isoformat()]
 
