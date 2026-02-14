@@ -94,6 +94,7 @@ def analyze_data_hourly(
     df_stats_forecast.rename(index={0: "min", 1: "max", 2: "avg"}, inplace=True)
 
     return (
+        df,
         df_5h,
         df_1d,
         df_archive,
