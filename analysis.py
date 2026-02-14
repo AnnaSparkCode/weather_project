@@ -21,8 +21,8 @@ def analyze_data_hourly(
         df (pd.DataFrame): DataFrame containing weather data with a 'time' column.
 
     Returns:
-        tuple: A tuple containing DataFrames for 5 hour, 1 day and the archived 4 day intervals,
-               as well as DataFrames with min, max, and average statistics for each interval and the forecast data.
+        tuple: A tuple containing DataFrames for archived data (5 hours, 1 day, and 4 days) and forecast data (3 days),
+               as well as DataFrames with min, max, and average statistics for each interval.
     """
 
     # Convert timestamp strings to datetime objects
@@ -32,7 +32,7 @@ def analyze_data_hourly(
     hours_5 = timedelta(hours=5)
     days_1 = timedelta(days=1)
 
-    # Split historical and forecast data
+    # Split archived and forecast data
     # .dt.date is used to compare only the date part of the timestamp, ignoring the time part
 
     # Future data (forecast) - 3 days ahead
@@ -94,6 +94,7 @@ def analyze_data_hourly(
     df_stats_forecast.rename(index={0: "min", 1: "max", 2: "avg"}, inplace=True)
 
     return (
+        df,
         df_5h,
         df_1d,
         df_archive,
@@ -117,8 +118,8 @@ def analyze_data_daily(
         df (pd.DataFrame): DataFrame containing weather data with a 'time' column.
 
     Returns:
-        tuple: A tuple containing DataFrames for 7 day, 30 day, and 90 day intervals,
-               as well as DataFrames with min, max, and average statistics for each interval.
+        tuple: A tuple containing DataFrames for a custom time limit interval (default is 30 days),
+               as well as DataFrames with min, max, and average statistics for that interval.
     """
 
     # Convert timestamp strings to datetime objects
@@ -129,14 +130,9 @@ def analyze_data_daily(
 
     days_limit = timedelta(days=time_limit)
 
-    # From the last timestamp, go back  a custom time limit set by the user (default is 30 days)
+    # From the last timestamp, go back a custom time limit set by the user (default is 30 days)
     # This assumes that the DataFrame is sorted by time in ascending order
     df_custom = df[df["time"] >= (df.iloc[-1].loc["time"] - days_limit).isoformat()]
-
-    # Calculate min, max and average values for the entire DataFrame
-    min_data = df.drop("time", axis=1).min()
-    max_data = df.drop("time", axis=1).max()
-    avg_data = df.drop("time", axis=1).mean()
 
     # Calculate min, max and average values for the custom time limit DataFrame
     min_data_custom = df_custom.drop("time", axis=1).min()
@@ -144,16 +140,14 @@ def analyze_data_daily(
     avg_data_custom = df_custom.drop("time", axis=1).mean()
 
     # Combine the series into a DataFrame (first combine into columns and then transpose)
-    df_stats = pd.concat([min_data, max_data, avg_data], axis=1).T
     df_stats_custom = pd.concat(
         [min_data_custom, max_data_custom, avg_data_custom], axis=1
     ).T
 
     # Rename the row labels
-    df_stats.rename(index={0: "min", 1: "max", 2: "avg"}, inplace=True)
     df_stats_custom.rename(index={0: "min", 1: "max", 2: "avg"}, inplace=True)
 
-    return df_custom, df_stats, df_stats_custom
+    return df_custom, df_stats_custom
 
 
 if __name__ == "__main__":
@@ -170,7 +164,7 @@ if __name__ == "__main__":
 
     raw_data = fetch_hourly_metric_data(52.52, 13.41)
     df_hourly = data_in_table(raw_data)
-    print(analyze_data_hourly(df_hourly)[0])  # Print 5 hour DataFrame for testing
+    print(analyze_data_hourly(df_hourly)[1])  # Print 5 hour DataFrame for testing
 
     # raw_data = fetch_daily_data(52.52, 13.41)
     # df_daily = daily_data_table(raw_data)
