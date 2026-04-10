@@ -61,7 +61,7 @@ def analyzed_daily_data(sample_daily_metric_data: pd.DataFrame):
 
 def test_instance_of_dataFrames(
     analyzed_hourly_data: tuple[pd.DataFrame], analyzed_daily_data: tuple[pd.DataFrame]
-):
+) -> None:
     """Test that the outputs of the analysis functions are DataFrames."""
 
     for index, df in enumerate(analyzed_hourly_data):
@@ -77,7 +77,7 @@ def test_instance_of_dataFrames(
 
 def test_non_empty_dataFrames(
     analyzed_hourly_data: tuple[pd.DataFrame], analyzed_daily_data: tuple[pd.DataFrame]
-):
+) -> None:
     """Test that the DataFrames returned by the analysis functions are not empty."""
 
     for df in analyzed_hourly_data:
