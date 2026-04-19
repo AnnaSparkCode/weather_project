@@ -9,15 +9,41 @@ class City:
     :country: Country name
     :coords: (lat, lng)
     """
+    # dataframe for csv data
+    dfc = pd.read_csv("worldcities.csv")
+    dfc["city_ascii"] = dfc["city_ascii"].str.lower()
+    dfc["country"] = dfc["country"].str.lower()
+
     def __init__(self, name, country):
-        self.name = name
-        self.country = country
+        self.name = name.strip()
+        self.country = country.strip()
         self.coords = ()
 
         self.coords = self.get_coords_csv()
     
     def __str__(self):
         return(f"{self.name}'s coordinates = {self.coords}")
+    
+    @classmethod
+    def city_name_present(cls, name):
+        """
+        Checks if the entered city name is in csv or not
+        """
+        return name.lower().strip() in cls.dfc["city_ascii"].values
+    
+    @classmethod
+    def city_country_matches(cls, name, country):
+        """
+        Checks if the valid city name is in entered country or not
+        """
+        city_name = name.lower().strip()
+        city_country = country.lower().strip()
+        match = cls.dfc[
+            (cls.dfc["city_ascii"] == city_name) &
+            (cls.dfc["country"] == city_country)
+            ]
+        return not match.empty
+
     
     def get_coords_csv(self)-> tuple:
         """
@@ -28,18 +54,15 @@ class City:
         :rtype: tuple
         """
         res = ()
-        dfc = pd.read_csv("worldcities.csv")
-        dfc["city_ascii"] = dfc["city_ascii"].str.lower()
-        dfc["country"] = dfc["country"].str.lower()
 
         search_city = self.name.lower().strip()
         serch_cntry = self.country.lower().strip()
 
         # exact match for city and country
         # because same city is in multiple countries like "Kota" in Japan and India
-        match = dfc[
-            (dfc["city_ascii"] == search_city) & 
-            (dfc["country"] == serch_cntry)
+        match = self.dfc[
+            (self.dfc["city_ascii"] == search_city) &
+            (self.dfc["country"] == serch_cntry)
             ]
         
         # pick first value from csv if same city and country are multiple times
@@ -88,20 +111,30 @@ class UserInputs:
             b. if yes, checks if the city name is in Data or not
         2. Returns latitude and longitude as tuple
         """
-        user_city = input("Enter a city name: ")
-        city_chars = user_city.strip()
-        if not all(char.isalpha() or char.isspace() for char in city_chars):
-            print("Enter only characters")
+        while True:
             user_city = input("Enter a city name: ")
+            user_city = user_city.strip()
+            if not all(char.isalpha() or char.isspace() for char in user_city or not user_city):
+                print("Enter only characters")
+                continue
+
+            if City.city_name_present(user_city):
+                break
+
+            print(f"City '{user_city}' not found in database.")
         
-        user_country = input("Enter country name: ")
-        cntry_chars = user_country.strip()
-        if not all(char.isalpha() or char.isspace() for char in cntry_chars):
-            print("Enter only characters")
+        while True:
             user_country = input("Enter country name: ")
-        
-        city_coords = City(user_city, user_country).coords
-        return city_coords
+            user_country = user_country.strip()
+            if not all(char.isalpha() or char.isspace() for char in user_country or not user_country):
+                print("Enter only characters")
+                continue
+
+            if City.city_country_matches(user_city, user_country):
+                city_coords = City(user_city, user_country).coords
+                return city_coords
+            
+            print(f"City '{user_city}' not found in '{user_country}' in database.")
     
 
     #-------- Functions for configured values : Start--------
