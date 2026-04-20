@@ -126,8 +126,7 @@ def analyzed_daily_imperial_data(mock_daily_imperial_data):
 #         )
 
 
-# Test with parametrization to avoid code duplication
-# Note: This uses indirect parametrization
+# Test with indirect parametrization to avoid code duplication
 # The analyzed_data fixture will be called with the values from the parametrize decorator
 # It will retrieve the corresponding fixture value based on the parameter value and pass it to the test function.
 @pytest.fixture
@@ -170,8 +169,7 @@ def test_instance_of_dataFrames(analyzed_data: tuple[pd.DataFrame, ...]) -> None
 #         assert not df.empty, "One of the DataFrames in analyzed_daily_data is empty"
 
 
-# Test with parametrization to avoid code duplication
-# Note: This uses indirect parametrization
+# Test with indirect parametrization to avoid code duplication
 @pytest.mark.parametrize(
     "analyzed_data",
     [
