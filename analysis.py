@@ -4,7 +4,7 @@ from tzlocal import get_localzone
 
 
 def analyze_data_hourly(
-    df: pd.DataFrame,
+    df: pd.DataFrame, now: datetime = datetime.now(get_localzone())
 ) -> tuple[
     pd.DataFrame,
     pd.DataFrame,
@@ -30,9 +30,6 @@ def analyze_data_hourly(
 
     # Convert timestamp strings to datetime objects
     df["time"] = pd.to_datetime(df["time"], utc=True)
-
-    local_tz = get_localzone()  # get local timezone
-    now = datetime.now(local_tz)  # get timezone-aware datetime object
 
     hours_5 = timedelta(hours=5)
     days_1 = timedelta(days=1)
