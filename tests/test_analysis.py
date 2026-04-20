@@ -2,6 +2,7 @@ import pytest
 import json
 import pandas as pd
 from pathlib import Path
+from datetime import timezone, datetime
 from analysis import analyze_data_hourly, analyze_data_daily
 
 
@@ -48,15 +49,21 @@ def mock_daily_imperial_data(filepath: Path):
 
 
 @pytest.fixture
-def analyzed_hourly_metric_data(mock_hourly_metric_data):
-    """Fixture to analyze the mock hourly metric data and return the results."""
-    return analyze_data_hourly(mock_hourly_metric_data)
+def now():
+    """Fixture to provide a fixed datetime for testing."""
+    return datetime.fromisoformat("2026-04-10T00:00:00.000Z").astimezone(timezone.utc)
 
 
 @pytest.fixture
-def analyzed_hourly_imperial_data(mock_hourly_imperial_data):
+def analyzed_hourly_metric_data(mock_hourly_metric_data, now):
+    """Fixture to analyze the mock hourly metric data and return the results."""
+    return analyze_data_hourly(mock_hourly_metric_data, now)
+
+
+@pytest.fixture
+def analyzed_hourly_imperial_data(mock_hourly_imperial_data, now):
     """Fixture to analyze the mock hourly imperial data and return the results."""
-    return analyze_data_hourly(mock_hourly_imperial_data)
+    return analyze_data_hourly(mock_hourly_imperial_data, now)
 
 
 @pytest.fixture
