@@ -48,70 +48,82 @@ def mock_daily_imperial_data(filepath: Path):
 
 
 @pytest.fixture
-def analyzed_hourly_data(mock_hourly_metric_data):
+def analyzed_hourly_metric_data(mock_hourly_metric_data):
     """Fixture to analyze the mock hourly metric data and return the results."""
     return analyze_data_hourly(mock_hourly_metric_data)
 
 
 @pytest.fixture
-def analyzed_daily_data(mock_daily_metric_data):
+def analyzed_hourly_imperial_data(mock_hourly_imperial_data):
+    """Fixture to analyze the mock hourly imperial data and return the results."""
+    return analyze_data_hourly(mock_hourly_imperial_data)
+
+
+@pytest.fixture
+def analyzed_daily_metric_data(mock_daily_metric_data):
     """Fixture to analyze the mock daily metric data and return the results."""
     return analyze_data_daily(mock_daily_metric_data)
 
 
-# Test without parametrization
-def test_instance_of_dataFrames_1(
-    analyzed_hourly_data: tuple[pd.DataFrame, ...],
-    analyzed_daily_data: tuple[pd.DataFrame, ...],
-) -> None:
-    """Test that the outputs of the analysis functions are DataFrames."""
-
-    for index, df in enumerate(analyzed_hourly_data):
-        assert isinstance(df, pd.DataFrame), (
-            f"Element at index {index} is not a DataFrame"
-        )
-
-    for index, df in enumerate(analyzed_daily_data):
-        assert isinstance(df, pd.DataFrame), (
-            f"Element at index {index} is not a DataFrame"
-        )
+@pytest.fixture
+def analyzed_daily_imperial_data(mock_daily_imperial_data):
+    """Fixture to analyze the mock daily imperial data and return the results."""
+    return analyze_data_daily(mock_daily_imperial_data)
 
 
-# Test with parametrization to avoid code duplication
-# Note: This test will not work.
-# You can pass fixture functions as arguments in test functions but not in parametrization functions!
-@pytest.mark.parametrize(
-    "analyzed_data",
-    [analyzed_hourly_data, analyzed_daily_data],
-)
-def test_instance_of_dataFrames_2(analyzed_data: tuple[pd.DataFrame, ...]) -> None:
-    """Test that the outputs of the analysis functions are DataFrames."""
+# # Test without parametrization
+# def test_instance_of_dataFrames_1(
+#     analyzed_hourly_data: tuple[pd.DataFrame, ...],
+#     analyzed_daily_data: tuple[pd.DataFrame, ...],
+# ) -> None:
+#     """Test that the outputs of the analysis functions are DataFrames."""
 
-    for index, df in enumerate(analyzed_data):
-        assert isinstance(df, pd.DataFrame), (
-            f"Element at index {index} is not a DataFrame"
-        )
+#     for index, df in enumerate(analyzed_hourly_data):
+#         assert isinstance(df, pd.DataFrame), (
+#             f"Element at index {index} is not a DataFrame"
+#         )
+
+#     for index, df in enumerate(analyzed_daily_data):
+#         assert isinstance(df, pd.DataFrame), (
+#             f"Element at index {index} is not a DataFrame"
+#         )
 
 
-# Test with parametrization to avoid code duplication
-# Note: This test will work because we are using the fixture names as strings
-# and retrieving the fixture value inside the test function.
-@pytest.mark.parametrize(
-    "fixture_name",
-    ["analyzed_hourly_data", "analyzed_daily_data"],
-)
-def test_instance_of_dataFrames_3(
-    fixture_name: str, request: pytest.FixtureRequest
-) -> None:
-    """Test that the outputs of the analysis functions are DataFrames."""
+# # Test with parametrization to avoid code duplication
+# # Note: This test will not work.
+# # You can pass fixture functions as arguments in test functions but not in parametrization functions!
+# @pytest.mark.parametrize(
+#     "analyzed_data",
+#     [analyzed_hourly_data, analyzed_daily_data],
+# )
+# def test_instance_of_dataFrames_2(analyzed_data: tuple[pd.DataFrame, ...]) -> None:
+#     """Test that the outputs of the analysis functions are DataFrames."""
 
-    # Get the analyzed data from the fixture
-    analyzed_data = request.getfixturevalue(fixture_name)
+#     for index, df in enumerate(analyzed_data):
+#         assert isinstance(df, pd.DataFrame), (
+#             f"Element at index {index} is not a DataFrame"
+#         )
 
-    for index, df in enumerate(analyzed_data):
-        assert isinstance(df, pd.DataFrame), (
-            f"Element at index {index} is not a DataFrame"
-        )
+
+# # Test with parametrization to avoid code duplication
+# # Note: This test will work because we are using the fixture names as strings
+# # and retrieving the fixture value inside the test function.
+# @pytest.mark.parametrize(
+#     "fixture_name",
+#     ["analyzed_hourly_data", "analyzed_daily_data"],
+# )
+# def test_instance_of_dataFrames_3(
+#     fixture_name: str, request: pytest.FixtureRequest
+# ) -> None:
+#     """Test that the outputs of the analysis functions are DataFrames."""
+
+#     # Get the analyzed data from the fixture
+#     analyzed_data = request.getfixturevalue(fixture_name)
+
+#     for index, df in enumerate(analyzed_data):
+#         assert isinstance(df, pd.DataFrame), (
+#             f"Element at index {index} is not a DataFrame"
+#         )
 
 
 # Test with parametrization to avoid code duplication
@@ -125,11 +137,16 @@ def analyzed_data(request) -> tuple[pd.DataFrame, ...]:
 
 @pytest.mark.parametrize(
     "analyzed_data",
-    ["analyzed_hourly_data", "analyzed_daily_data"],
+    [
+        "analyzed_hourly_metric_data",
+        "analyzed_hourly_imperial_data",
+        "analyzed_daily_metric_data",
+        "analyzed_daily_imperial_data",
+    ],
     indirect=True,
-    ids=["hourly", "daily"],
+    ids=["hourly_metric", "hourly_imperial", "daily_metric", "daily_imperial"],
 )
-def test_instance_of_dataFrames_4(analyzed_data: tuple[pd.DataFrame, ...]) -> None:
+def test_instance_of_dataFrames(analyzed_data: tuple[pd.DataFrame, ...]) -> None:
     """Test that the outputs of the analysis functions are DataFrames."""
 
     for index, df in enumerate(analyzed_data):
@@ -138,14 +155,38 @@ def test_instance_of_dataFrames_4(analyzed_data: tuple[pd.DataFrame, ...]) -> No
         )
 
 
+# # Test without parametrization
+# def test_non_empty_dataFrames_1(
+#     analyzed_hourly_data: tuple[pd.DataFrame, ...],
+#     analyzed_daily_data: tuple[pd.DataFrame, ...],
+# ) -> None:
+#     """Test that the DataFrames returned by the analysis functions are not empty."""
+
+#     for df in analyzed_hourly_data:
+#         print(df)  # Debugging line to print the DataFrame
+#         assert not df.empty, "One of the DataFrames in analyzed_hourly_data is empty"
+
+#     for df in analyzed_daily_data:
+#         assert not df.empty, "One of the DataFrames in analyzed_daily_data is empty"
+
+
+# Test with parametrization to avoid code duplication
+# Note: This uses indirect parametrization
+@pytest.mark.parametrize(
+    "analyzed_data",
+    [
+        "analyzed_hourly_metric_data",
+        "analyzed_hourly_imperial_data",
+        "analyzed_daily_metric_data",
+        "analyzed_daily_imperial_data",
+    ],
+    indirect=True,
+    ids=["hourly_metric", "hourly_imperial", "daily_metric", "daily_imperial"],
+)
 def test_non_empty_dataFrames(
-    analyzed_hourly_data: tuple[pd.DataFrame, ...],
-    analyzed_daily_data: tuple[pd.DataFrame, ...],
+    analyzed_data: tuple[pd.DataFrame, ...],
 ) -> None:
     """Test that the DataFrames returned by the analysis functions are not empty."""
 
-    for df in analyzed_hourly_data:
-        assert not df.empty
-
-    for df in analyzed_daily_data:
-        assert not df.empty
+    for index, df in enumerate(analyzed_data):
+        assert not df.empty, f"Element at index {index} is empty"
