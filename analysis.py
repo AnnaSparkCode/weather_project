@@ -14,6 +14,8 @@ def analyze_data_hourly(
     pd.DataFrame,
     pd.DataFrame,
     pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
 ]:
     """Analyze the hourly weather data and calculate min, max and average values for different time intervals.
     The hourly data include today's data, archived data up to 4 days and forecast data up to 3 days.
@@ -115,7 +117,7 @@ def analyze_data_hourly(
 
 def analyze_data_daily(
     df: pd.DataFrame, time_limit: int = 30
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Analyze the daily weather data and calculate min, max and average values for different time intervals.
     The daily data include archived data from yesterday up to a custom time limit set by the user.
     The default time limit is 30 days in the past and the maximum time limit is 90 days in the past.
