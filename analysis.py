@@ -22,6 +22,7 @@ def analyze_data_hourly(
 
     Args:
         df (pd.DataFrame): DataFrame containing weather data with a 'time' column.
+        now (datetime, optional): Current datetime for analysis. Defaults to datetime.now(get_localzone()).
 
     Returns:
         tuple: A tuple containing DataFrames for archived data (5 hours, 1 day, and 4 days) and forecast data (3 days),
