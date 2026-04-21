@@ -4,8 +4,10 @@ from tzlocal import get_localzone
 
 
 def analyze_data_hourly(
-    df: pd.DataFrame,
+    df: pd.DataFrame, now: datetime = datetime.now(get_localzone())
 ) -> tuple[
+    pd.DataFrame,
+    pd.DataFrame,
     pd.DataFrame,
     pd.DataFrame,
     pd.DataFrame,
@@ -20,6 +22,7 @@ def analyze_data_hourly(
 
     Args:
         df (pd.DataFrame): DataFrame containing weather data with a 'time' column.
+        now (datetime, optional): Current datetime for analysis. Defaults to datetime.now(get_localzone()).
 
     Returns:
         tuple: A tuple containing DataFrames for archived data (5 hours, 1 day, and 4 days) and forecast data (3 days),
@@ -28,9 +31,6 @@ def analyze_data_hourly(
 
     # Convert timestamp strings to datetime objects
     df["time"] = pd.to_datetime(df["time"], utc=True)
-
-    local_tz = get_localzone()  # get local timezone
-    now = datetime.now(local_tz)  # get timezone-aware datetime object
 
     hours_5 = timedelta(hours=5)
     days_1 = timedelta(days=1)
@@ -115,7 +115,7 @@ def analyze_data_hourly(
 
 def analyze_data_daily(
     df: pd.DataFrame, time_limit: int = 30
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Analyze the daily weather data and calculate min, max and average values for different time intervals.
     The daily data include archived data from yesterday up to a custom time limit set by the user.
     The default time limit is 30 days in the past and the maximum time limit is 90 days in the past.
